@@ -18,6 +18,10 @@ class ArchesInstance(models.Model):
 		if not 'resources' in data:
 			return None
 		return data['resources']
+	def get_advanced_search_parameters(self):
+		url = self.url.rstrip('/') + "/search_component_data/advanced-search"
+		with requests.get(url, headers={'User-Agent': settings.USER_AGENT}) as r:
+			return r.json()
 
 class ArchesLogin(models.Model):
 

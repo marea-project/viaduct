@@ -2,8 +2,9 @@ from django.db import models
 from django.conf import settings
 from django.core.validators import validate_slug
 from django.contrib.auth.models import User
+from urllib.parse import urlencode
 from rdflib import Graph
-import uuid, requests
+import uuid, requests, json
 
 class ArchesInstance(models.Model):
 
@@ -31,6 +32,20 @@ class ArchesInstance(models.Model):
 		url = self.url.rstrip('/') + "/concepts/tree/semantic"
 		with requests.get(url, headers={'User-Agent': settings.USER_AGENT}) as r:
 			return r.json()
+	def search(self, query_string):
+		filter = [{'inverted': False, 'type': 'string', 'context': '', 'context_label': '', 'id': query_string, 'text': 'Contains Term: ' + query_string, 'value': query_string, 'selected': True}]
+		query = {'paging-filter': '1', 'tiles': 'true', 'format': 'tilecsv', 'reportlink': 'true', 'language': '*', 'term-filter': json.dumps(filter)}
+		url = self.url.rstrip('/') + "/search/resources?" + urlencode(query)
+		data = {}
+		with requests.get(url, headers={'User-Agent': settings.USER_AGENT}) as r:
+			data = r.json()
+		if not 'results' in data:
+			return []
+		if not 'hits' in data['results']:
+			return []
+		if not 'hits' in data['results']['hits']:
+			return []
+		return data['results']['hits']['hits']
 	
 	def __str__(self):
 		return self.label
@@ -99,8 +114,18 @@ class Concept(models.Model):
 	thesaurus = models.ForeignKey(Thesaurus, on_delete=models.CASCADE, related_name='concepts')
 	conceptid = models.UUIDField(default=uuid.uuid4)
 
+	@property
+	def label(self):
+		label = self.properties.filter(property='prefLabel', lang__startswith='en').first()
+		if label:
+			return str(label.value)
+		return self.conceptid
+
 	class Meta:
 		unique_together = ('thesaurus', 'conceptid',)
+
+	def __str__(self):
+		return str(self.thesaurus) + ' / ' + str(self.label)
 
 class ConceptProperty(models.Model):
 
@@ -115,4 +140,3 @@ class ConceptPredicate(models.Model):
 	subject = models.ForeignKey(Concept, on_delete=models.CASCADE, related_name='predicates')
 	property = models.SlugField(max_length=128)
 	object = models.ForeignKey(Concept, on_delete=models.CASCADE, related_name='predicates_rev')
-	thesaurus = models.ForeignKey(Thesaurus, null=True, blank=True, on_delete=models.SET_NULL)

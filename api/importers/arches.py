@@ -21,25 +21,6 @@ def load_instance_models(arches):
 			model.slug = ''
 		model.save()
 
-
-# dict_keys(['author', 'color', 'config', 'deploymentdate', 'deploymentfile',
-# 'description', 'disable_instance_creation', 'functions', 'graphid', 'iconclass',
-# 'isresource', 'jsonldcontext', 'name', 'ontology_id', 'publication_id', 'slug',
-# 'subtitle', 'template_id', 'version'])
-
-#        instance = models.ForeignKey(ArchesInstance, on_delete=models.CASCADE, related_name='models')
-#        graphid = models.UUIDField(default=uuid.uuid4)
-#        name = models.CharField(max_length=128, blank=True, null=True)
-#        description = models.TextField(blank=True, null=True)
-#        version = models.TextField(blank=True, null=True)
-#        iconclass = models.TextField(blank=True, null=True)
-#        color = models.TextField(blank=True, null=True)
-#        subtitle = models.TextField(blank=True, null=True)
-#        slug = models.TextField(validators=[validate_slug])
-#        config = models.JSONField(db_column="config", default=dict)
-#        created_time = models.DateTimeField(auto_now_add=True)
-#        updated_time = models.DateTimeField(auto_now=True)
-
 def load_instance_thesauri(arches):
 
 	for item in arches.get_thesauri():
@@ -69,22 +50,74 @@ def __convert_arches_skos_to_string(value):
 			return (parsed_value['value'], lang)
 	return (str(value), lang)
 
+def __create_or_get_concept(uri, thesaurus=None):
+	concept_id = str(uri).replace('#', '/').split('/')[-1]
+	try:
+		concept = Concept.objects.get(thesaurus=thesaurus, conceptid=concept_id)
+	except:
+		concept = Concept(thesaurus=thesaurus, conceptid=concept_id)
+		concept.save()
+	return concept
+
+def __create_or_get_property(subject, property, value, lang='en', type='literal'):
+
+	try:
+		ret = ConceptProperty.objects.get(subject=subject, property=property, value=value, lang=lang, type=type)
+	except:
+		ret = ConceptProperty(subject=subject, property=property, value=value, lang=lang, type=type)
+		ret.save()
+	return ret
+
+def __create_or_get_predicate(subject, property, object):
+
+	try:
+		ret = ConceptPredicate.objects.get(subject=subject, property=property, object=object)
+	except:
+		ret = ConceptPredicate(subject=subject, property=property, object=object)
+		ret.save()
+	return ret
+
 def import_thesaurus(thesaurus):
 
 	g = thesaurus.load_skos()
+	ConceptProperty.objects.filter(subject__thesaurus=thesaurus).delete()
+	ConceptPredicate.objects.filter(subject__thesaurus=thesaurus).delete()
 	concepts = []
 	for concept, p, o in g.triples((None, RDF.type, SKOS.Concept)):
 		concepts.append(concept)
 	for concept in concepts:
-		print(concept)
-		print('  Properties')
+		item = __create_or_get_concept(str(concept), thesaurus)
 		for s, p, o in g.triples((concept, None, None)):
 			if o.__class__.__name__ == 'URIRef':
 				continue
+			p_uri = str(p)
+			if p_uri == 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type':
+				continue
+			p_id = p_uri.replace('#', '/').split('/')[-1]
 			value, lang = __convert_arches_skos_to_string(o)
-			print('    ' + str(p) + ': ' + value + ' @ ' + lang)
+			prop = __create_or_get_property(item, p_id, value, lang, 'literal')
 		print('  Predicates')
 		for s, p, o in g.triples((concept, None, None)):
 			if not o.__class__.__name__ == 'URIRef':
 				continue
-			print('    ' + str(p) + ': ' + str(o))
+			p_uri = str(p)
+			if p_uri == 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type':
+				continue
+			p_id = p_uri.replace('#', '/').split('/')[-1]
+			object = __create_or_get_concept(str(o), thesaurus)
+			pred = __create_or_get_predicate(item, p_id, object)
+
+
+#class ConceptProperty(models.Model):
+#
+#	subject = models.ForeignKey(Concept, on_delete=models.CASCADE, related_name='properties')
+#	property = models.SlugField(max_length=128)
+#	value = models.TextField(default='')
+#	type = models.SlugField(max_length=64, default='literal')
+#	lang = models.SlugField(max_length=64, default='en')
+
+#class ConceptPredicate(models.Model):
+#
+#	subject = models.ForeignKey(Concept, on_delete=models.CASCADE, related_name='predicates')
+#	property = models.SlugField(max_length=128)
+#	object = models.ForeignKey(Concept, on_delete=models.CASCADE, related_name='predicates_rev')

@@ -4,6 +4,7 @@
 __pycache__
 db.sqlite3
 media
+docs
 .env
 
 viaduct/settings_local.py

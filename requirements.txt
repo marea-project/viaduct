@@ -6,7 +6,10 @@ django-rest-framework==0.1.0
 djangorestframework==3.16.1
 idna==3.11
 importlib-metadata==8.7.1
+isodate==0.7.2
 markdown==3.9
+pyparsing==3.3.2
+rdflib==7.5.0
 requests==2.32.5
 sqlparse==0.5.5
 typing-extensions==4.15.0

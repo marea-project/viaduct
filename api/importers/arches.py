@@ -3,7 +3,7 @@ from ..models import GraphModel, Thesaurus, Concept, ConceptPredicate, ConceptPr
 import json
 
 def load_instance_models(arches):
-
+	"""Loads the resource models contained within an Arches instance, and stores them locally."""
 	for item in arches.get_models():
 		try:
 			model = GraphModel.objects.get(instance=arches, graphid=item['graphid'])
@@ -22,7 +22,7 @@ def load_instance_models(arches):
 		model.save()
 
 def load_instance_thesauri(arches):
-
+	"""Loads information about the thesauri contained on an Arches instance, and stores them locally."""
 	for item in arches.get_thesauri():
 		try:
 			thesaurus = Thesaurus.objects.get(instance=arches, thesaurusid=item['id'])
@@ -78,7 +78,7 @@ def __create_or_get_predicate(subject, property, object):
 	return ret
 
 def import_thesaurus(thesaurus):
-
+	"""Loads a thesaurus proper from an Arches instance, parses the SKOS, and stores locally within the Viaduct database."""
 	g = thesaurus.load_skos()
 	ConceptProperty.objects.filter(subject__thesaurus=thesaurus).delete()
 	ConceptPredicate.objects.filter(subject__thesaurus=thesaurus).delete()

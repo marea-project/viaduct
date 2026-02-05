@@ -1,3 +1,15 @@
+"""
+Django settings for the viaduct project.
+
+Contains the minimal configuration required for the project. This file is
+imported by manage.py and WSGI/ASGI entry points.
+
+Note:
+- Local, deployment-specific overrides should live in settings_local.py
+  (this file is imported at the end of the module).
+- This file is documented inline for Sphinx autodoc generation.
+"""
+
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -63,4 +75,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 REST_FRAMEWORK = {'DEFAULT_PERMISSION_CLASSES': ['rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly']}
 USER_AGENT = 'Viaduct/0.1'
 
+# Load any local overrides (not tracked here).
 from .settings_local import *

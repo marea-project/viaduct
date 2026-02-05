@@ -1,9 +1,25 @@
 #!/usr/bin/env python
+"""
+manage.py - Management script for Viaduct.
+
+This module provides the main() entry point used to run administrative
+commands via Django's management utility.
+"""
+
 import os
 import sys
 
 def main():
-	"""Run administrative tasks."""
+	"""
+    Run administrative tasks.
+
+    :rtype: None
+
+    Example::
+
+        # Run Django management commands from the command line
+        $ ./manage.py runserver
+    """
 	os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'viaduct.settings')
 	try:
 		from django.core.management import execute_from_command_line

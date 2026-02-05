@@ -1,3 +1,11 @@
+"""
+Arches-related models and helpers.
+
+This module defines models that represent remote Arches instances, logins and
+graph models. Many methods perform HTTP requests against an Arches API and
+return parsed JSON responses.
+"""
+
 from django.db import models
 from django.conf import settings
 from django.core.validators import validate_slug
@@ -7,12 +15,36 @@ from rdflib import Graph
 import uuid, requests, json
 
 class ArchesInstance(models.Model):
+	"""
+	Represents a remote Arches instance.
 
+	:param label: human-readable label for the instance
+	:type label: str
+	:param url: base URL of the remote Arches instance
+	:type url: str
+
+	Methods perform HTTP GET requests (using requests) to fetch resources and
+	metadata from the instance. All requests set the 'User-Agent' header using
+	the project's USER_AGENT setting.
+
+	Example::
+
+		instance = ArchesInstance.objects.create(label='Test', url='https://arches.example')
+		models = instance.get_models()
+	"""
 	label = models.CharField(max_length=64, null=False)
 	url = models.URLField(null=False)
 	created_time = models.DateTimeField(auto_now_add=True)
 	updated_time = models.DateTimeField(auto_now=True)
 	def get_models(self):
+		"""
+		Fetch a list of resource models from the instance.
+
+		:returns: list of models or None when the response does not include 'resources'
+		:rtype: list or None
+
+		:raises requests.RequestException: on network or response errors
+		"""
 		url = self.url.rstrip('/') + "/search_component_data/resource-type-filter"
 		data = {}
 		with requests.get(url, headers={'User-Agent': settings.USER_AGENT}) as r:
@@ -21,18 +53,51 @@ class ArchesInstance(models.Model):
 			return None
 		return data['resources']
 	def get_advanced_search_parameters(self):
+		"""
+		Retrieve information required in order to perform an advanced search on this instance.
+
+		:returns: JSON data returned from the HTTP call
+		:rtype: dict
+
+		:raises requests.RequestException: on network or response errors
+		"""
 		url = self.url.rstrip('/') + "/search_component_data/advanced-search"
 		with requests.get(url, headers={'User-Agent': settings.USER_AGENT}) as r:
 			return r.json()
 	def get_collections(self):
+		"""
+		Retrieve the list of collections from the Arches instance.
+
+		:returns: list of collections
+		:rtype: dict
+		"""
 		url = self.url.rstrip('/') + "/concepts/tree/collections"
 		with requests.get(url, headers={'User-Agent': settings.USER_AGENT}) as r:
 			return r.json()
 	def get_thesauri(self):
+		"""
+		Fetch a list of thesauri from the instance.
+
+		:returns: list of thesauri
+		:rtype: dict
+		"""
 		url = self.url.rstrip('/') + "/concepts/tree/semantic"
 		with requests.get(url, headers={'User-Agent': settings.USER_AGENT}) as r:
 			return r.json()
 	def search(self, query_string):
+		"""
+		Search the Arches instance for resources matching query_string.
+
+		:param query_string: the search term
+		:type query_string: str
+		:returns: list of results (possibly empty)
+		:rtype: list
+
+		Example::
+
+			>>> instance.search('mosque')
+			[{'_id': '...', '_source': ...}, ...]
+		"""
 		filter = [{'inverted': False, 'type': 'string', 'context': '', 'context_label': '', 'id': query_string, 'text': 'Contains Term: ' + query_string, 'value': query_string, 'selected': True}]
 		query = {'paging-filter': '1', 'tiles': 'true', 'format': 'tilecsv', 'reportlink': 'true', 'language': '*', 'term-filter': json.dumps(filter)}
 		url = self.url.rstrip('/') + "/search/resources?" + urlencode(query)
@@ -66,7 +131,13 @@ class ArchesLogin(models.Model):
 		unique_together = ('user', 'instance',)
 
 class GraphModel(models.Model):
+	"""
+	Represents a model definition (resource model) provided by an Arches instance.
 
+	:param instance: owning Arches instance
+	:param graphid: unique (to the instance) id for model
+	:param name: optional human readable name
+	"""
 	instance = models.ForeignKey(ArchesInstance, on_delete=models.CASCADE, related_name='models')
 	graphid = models.UUIDField(default=uuid.uuid4)
 	name = models.CharField(max_length=128, blank=True, null=True)

@@ -1,3 +1,10 @@
+"""
+URL routing for the api application.
+
+This module registers DRF viewsets into a DefaultRouter and exposes the router
+URLs at the package root.
+"""
+
 from django.urls import include, path
 from rest_framework import routers
 

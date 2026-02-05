@@ -96,7 +96,6 @@ def import_thesaurus(thesaurus):
 			p_id = p_uri.replace('#', '/').split('/')[-1]
 			value, lang = __convert_arches_skos_to_string(o)
 			prop = __create_or_get_property(item, p_id, value, lang, 'literal')
-		print('  Predicates')
 		for s, p, o in g.triples((concept, None, None)):
 			if not o.__class__.__name__ == 'URIRef':
 				continue
@@ -106,18 +105,3 @@ def import_thesaurus(thesaurus):
 			p_id = p_uri.replace('#', '/').split('/')[-1]
 			object = __create_or_get_concept(str(o), thesaurus)
 			pred = __create_or_get_predicate(item, p_id, object)
-
-
-#class ConceptProperty(models.Model):
-#
-#	subject = models.ForeignKey(Concept, on_delete=models.CASCADE, related_name='properties')
-#	property = models.SlugField(max_length=128)
-#	value = models.TextField(default='')
-#	type = models.SlugField(max_length=64, default='literal')
-#	lang = models.SlugField(max_length=64, default='en')
-
-#class ConceptPredicate(models.Model):
-#
-#	subject = models.ForeignKey(Concept, on_delete=models.CASCADE, related_name='predicates')
-#	property = models.SlugField(max_length=128)
-#	object = models.ForeignKey(Concept, on_delete=models.CASCADE, related_name='predicates_rev')

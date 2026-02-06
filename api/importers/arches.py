@@ -4,7 +4,10 @@ import json
 
 def load_instance_models(arches):
 	"""Loads the resource models contained within an Arches instance, and stores them locally."""
-	for item in arches.get_models():
+	models_list = arches.get_models()
+	if models_list is None:
+		models_list = []
+	for item in models_list:
 		try:
 			model = GraphModel.objects.get(instance=arches, graphid=item['graphid'])
 		except:

@@ -5,9 +5,8 @@ Contains HyperlinkedModelSerializer implementations for exposed resources.
 """
 
 from .models.user import User
-from .models.arches import GraphModel
+from .models.arches import GraphModel, ArchesInstance, Thesaurus
 from rest_framework import serializers
-
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     """
@@ -21,6 +20,14 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
         model = User
         fields = ['url', 'username']
 
+class ArchesInstanceSerializer(serializers.HyperlinkedModelSerializer):
+	"""
+	Serializer for Arches instances that are searchable with this
+	instance of Viaduct
+	"""
+	class Meta:
+		model = ArchesInstance
+		fields = ['label', 'url', 'models', 'thesauri']
 
 class GraphModelSerializer(serializers.HyperlinkedModelSerializer):
     """
@@ -34,3 +41,14 @@ class GraphModelSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = GraphModel
         fields = ['url', 'name', 'description']
+
+class ThesaurusSerializer(serializers.HyperlinkedModelSerializer):
+	class Meta:
+		model = Thesaurus
+		fields = ['label', 'url', 'instance', 'skos_url']
+
+class CompleteThesaurusSerializer(serializers.HyperlinkedModelSerializer):
+	concepts = serializers.ListField(source='build_description', read_only=True)
+	class Meta:
+		model = Thesaurus
+		fields = ['label', 'url', 'instance', 'skos_url', 'concepts']

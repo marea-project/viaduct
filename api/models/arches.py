@@ -49,6 +49,8 @@ class ArchesInstance(models.Model):
 		data = {}
 		with requests.get(url, headers={'User-Agent': settings.USER_AGENT}) as r:
 			data = r.json()
+		if data is None:
+			return None
 		if not 'resources' in data:
 			return None
 		return data['resources']
@@ -179,6 +181,9 @@ class Thesaurus(models.Model):
 		g = Graph()
 		g.parse(self.skos_url, format='xml')
 		return g
+	
+	def build_description(self):
+		return sorted([{"id": str(x.conceptid), "label": str(x.label)} for x in self.concepts.all()], key=lambda x: x['label'])
 
 class Concept(models.Model):
 

@@ -16,16 +16,19 @@
 <div id="urls" role="main">
 <div class="template_group_default">
 
+{% for item in results %}
+
     <article class="result result-default category-general">
-        <a href="https://en.wikipedia.org/wiki/Piney" class="url_header" rel="noreferrer"><div class="url_wrapper"><span class="url_o1"><span class="url_i1">https://en.wikipedia.org</span></span><span class="url_o2"><span class="url_i2"> › wiki › Piney</span></span>  </div></a>
-        <h3><a href="https://en.wikipedia.org/wiki/Piney" rel="noreferrer"><span class="highlight">Piney</span> - Wikipedia</a></h3>
-        <p class="content"><span class="highlight">Piney</span> is a term that can refer to various places, people, or things in different contexts. It may be a misspelling of pine, a nickname, a title, or a plant name.</p>
+        <a href="" class="url_header" rel="noreferrer"><div class="url_wrapper"><span class="url_o1"><span class="url_i1">https://en.wikipedia.org</span></span><span class="url_o2"><span class="url_i2"> › wiki › Piney</span></span>  </div></a>
+        <h3><a href="#" rel="noreferrer">{{ item.displayname }}</a></h3>
+        <p class="content">{{ item.displaydescription }}</p>
         <div class="engines">
-            <span>duckduckgo</span>
-            <span>wikipedia</span>
+            <span></span>
         </div>
         <div class="break"></div>
     </article>
+
+    {% endfor %}
 
 </div>
 </div>

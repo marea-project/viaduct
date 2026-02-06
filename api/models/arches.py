@@ -12,7 +12,7 @@ from django.core.validators import validate_slug
 from django.contrib.auth.models import User
 from urllib.parse import urlencode
 from rdflib import Graph
-import uuid, requests, json
+import uuid, requests, json, datetime
 
 class ArchesInstance(models.Model):
 	"""
@@ -86,6 +86,22 @@ class ArchesInstance(models.Model):
 		url = self.url.rstrip('/') + "/concepts/tree/semantic"
 		with requests.get(url, headers={'User-Agent': settings.USER_AGENT}) as r:
 			return r.json()
+
+	def _search_page(self, query_string, page=1):
+		filter = [{'inverted': False, 'type': 'string', 'context': '', 'context_label': '', 'id': query_string, 'text': 'Contains Term: ' + query_string, 'value': query_string, 'selected': True}]
+		query = {'paging-filter': page, 'tiles': 'true', 'format': 'tilecsv', 'reportlink': 'true', 'language': '*', 'term-filter': json.dumps(filter)}
+		url = self.url.rstrip('/') + "/search/resources?" + urlencode(query)
+		data = {}
+		with requests.get(url, headers={'User-Agent': settings.USER_AGENT}) as r:
+			data = r.json()
+		if not 'results' in data:
+			return []
+		if not 'hits' in data['results']:
+			return []
+		if not 'hits' in data['results']['hits']:
+			return []
+		return data['results']['hits']['hits']
+
 	def search(self, query_string):
 		"""
 		Search the Arches instance for resources matching query_string.
@@ -100,19 +116,18 @@ class ArchesInstance(models.Model):
 			>>> instance.search('mosque')
 			[{'_id': '...', '_source': ...}, ...]
 		"""
-		filter = [{'inverted': False, 'type': 'string', 'context': '', 'context_label': '', 'id': query_string, 'text': 'Contains Term: ' + query_string, 'value': query_string, 'selected': True}]
-		query = {'paging-filter': '1', 'tiles': 'true', 'format': 'tilecsv', 'reportlink': 'true', 'language': '*', 'term-filter': json.dumps(filter)}
-		url = self.url.rstrip('/') + "/search/resources?" + urlencode(query)
-		data = {}
-		with requests.get(url, headers={'User-Agent': settings.USER_AGENT}) as r:
-			data = r.json()
-		if not 'results' in data:
-			return []
-		if not 'hits' in data['results']:
-			return []
-		if not 'hits' in data['results']['hits']:
-			return []
-		return data['results']['hits']['hits']
+		ret = []
+		dt_limit = datetime.datetime.now() + datetime.timedelta(seconds=settings.ARCHES_SEARCH_TIMEOUT)
+		i = 1
+		while True:
+			page = self._search_page(query_string, i)
+			i = i + 1
+			if len(page) == 0:
+				break
+			if datetime.datetime.now() >= dt_limit:
+				break
+			ret = ret + page
+		return ret
 	
 	def __str__(self):
 		return self.label

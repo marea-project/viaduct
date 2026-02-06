@@ -1,0 +1,36 @@
+{% load static %}
+<!DOCTYPE html>
+<html class="no-js theme-auto center-alignment-yes" lang="en-EN" >
+<head>
+  <meta charset="UTF-8">
+  <meta name="endpoint" content="results">
+  <meta name="referrer" content="no-referrer">
+  <meta name="robots" content="noarchive">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="{% static 'css/search.css' %}" type="text/css" media="screen">
+  <title>Viaduct</title>
+</head>
+<body class="results_endpoint" >
+  <main id="main_results" class="">
+
+<div id="urls" role="main">
+<div class="template_group_default">
+
+    <article class="result result-default category-general">
+        <a href="https://en.wikipedia.org/wiki/Piney" class="url_header" rel="noreferrer"><div class="url_wrapper"><span class="url_o1"><span class="url_i1">https://en.wikipedia.org</span></span><span class="url_o2"><span class="url_i2"> › wiki › Piney</span></span>  </div></a>
+        <h3><a href="https://en.wikipedia.org/wiki/Piney" rel="noreferrer"><span class="highlight">Piney</span> - Wikipedia</a></h3>
+        <p class="content"><span class="highlight">Piney</span> is a term that can refer to various places, people, or things in different contexts. It may be a misspelling of pine, a nickname, a title, or a plant name.</p>
+        <div class="engines">
+            <span>duckduckgo</span>
+            <span>wikipedia</span>
+        </div>
+        <div class="break"></div>
+    </article>
+
+</div>
+</div>
+
+  </main>
+  {% include 'search/footer.html' %}
+</body>
+</html>

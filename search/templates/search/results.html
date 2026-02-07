@@ -13,23 +13,28 @@
 <body class="results_endpoint" >
   <main id="main_results" class="">
 
+<div id="results" class="only_template_default">
+
+<div id="sidebar">
+  <div id="infoboxes">
+    <details class="sidebar-collapsible" open="">
+      <summary class="title">Info</summary>
+      <aside class="infobox">
+        <h2 class="title"><bdi>Information</bdi></h2>
+        <p><bdi>Some information.</bdi></p>
+      </aside>
+    </details>
+  </div>
+</div>
+
 <div id="urls" role="main">
 <div class="template_group_default">
 
 {% for item in results %}
+  {% include 'search/result_item.html' %}
+{% endfor %}
 
-    <article class="result result-default category-general">
-        <a href="" class="url_header" rel="noreferrer"><div class="url_wrapper"><span class="url_o1"><span class="url_i1">https://en.wikipedia.org</span></span><span class="url_o2"><span class="url_i2"> › wiki › Piney</span></span>  </div></a>
-        <h3><a href="#" rel="noreferrer">{{ item.displayname }}</a></h3>
-        <p class="content">{{ item.displaydescription }}</p>
-        <div class="engines">
-            <span></span>
-        </div>
-        <div class="break"></div>
-    </article>
-
-    {% endfor %}
-
+</div>
 </div>
 </div>
 

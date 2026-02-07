@@ -87,7 +87,7 @@ class ArchesInstance(models.Model):
 		with requests.get(url, headers={'User-Agent': settings.USER_AGENT}) as r:
 			return r.json()
 
-	def _search_page(self, query_string, page=1):
+	def _get_search_page(self, query_string, page=1):
 		filter = [{'inverted': False, 'type': 'string', 'context': '', 'context_label': '', 'id': query_string, 'text': 'Contains Term: ' + query_string, 'value': query_string, 'selected': True}]
 		query = {'paging-filter': page, 'tiles': 'true', 'format': 'tilecsv', 'reportlink': 'true', 'language': '*', 'term-filter': json.dumps(filter)}
 		url = self.url.rstrip('/') + "/search/resources?" + urlencode(query)
@@ -100,7 +100,14 @@ class ArchesInstance(models.Model):
 			return []
 		if not 'hits' in data['results']['hits']:
 			return []
-		return data['results']['hits']['hits']
+		ret = []
+		for x in data['results']['hits']['hits']:
+			if '_source' in x:
+				x['_source']['source'] = {"url": self.url, "label": self.label}
+				if 'resourceinstanceid' in x['_source']:
+					x['_source']['url'] = self.url.rstrip('/') + "/report/" + str(x['_source']['resourceinstanceid'])
+			ret.append(x)
+		return ret
 
 	def search(self, query_string):
 		"""
@@ -120,7 +127,7 @@ class ArchesInstance(models.Model):
 		dt_limit = datetime.datetime.now() + datetime.timedelta(seconds=settings.ARCHES_SEARCH_TIMEOUT)
 		i = 1
 		while True:
-			page = self._search_page(query_string, i)
+			page = self._get_search_page(query_string, i)
 			i = i + 1
 			if len(page) == 0:
 				break

@@ -1,12 +1,34 @@
 from api.models.arches import ArchesInstance
+import re, asyncio
+
+def strip_html_tags(text):
+    return (re.sub(r'<.*?>', ' ', text)).strip()
 
 def keyword_search(query_string):
-    ret = {"results": [], "engines": []}
+    global results, ct, loop
+    results = []
+    ct = ArchesInstance.objects.count()
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    def callback(fut):
+        global results, ct, loop
+        results = results + fut.result()
+        ct = ct - 1
+        if ct<= 0:
+            loop.stop()
+    futures = []
     for arches in ArchesInstance.objects.all():
-        data = arches.search(query_string)
-        if len(data) == 0:
+        fut = asyncio.ensure_future(asyncio.to_thread(arches.search, query_string))
+        fut.add_done_callback(callback)
+        futures.append(fut)
+    loop.run_forever()
+
+    ret = []
+    for x in sorted(results, key=lambda x: x['_score']):
+        if not '_source' in x:
             continue
-        ret['results'] = ret['results'] + data
-        ret['engines'].append(arches)
-    ret['results'] = [x['_source'] for x in sorted(ret['results'], key=lambda x: x['_score'])]
+        if 'displaydescription' in x['_source']:
+            x['_source']['displaydescription'] = strip_html_tags(x['_source']['displaydescription'])
+        ret.append(x['_source'])
     return ret
+

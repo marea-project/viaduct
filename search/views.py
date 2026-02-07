@@ -7,4 +7,4 @@ def home(request):
 
 @csrf_exempt
 def results(request):
-	return render(request, 'search/results.html', keyword_search(request.POST['q']))
+	return render(request, 'search/results.html', {"results": keyword_search(request.POST['q'])})

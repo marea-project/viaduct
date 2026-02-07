@@ -1,0 +1,13 @@
+<article class="result result-default category-general">
+    <a href="{{ item.url }}" class="url_header" rel="noreferrer">
+        <div class="url_wrapper">
+            <span class="url_o1"><span class="url_i1">{{ item.source.url }}</span></span><span class="url_o2"><span class="url_i2"> › report › {{ item.resourceinstanceid }}</span></span>
+        </div>
+    </a>
+    <h3><a href="{{ item.url }}" rel="noreferrer">{{ item.displayname }}</a></h3>
+    <p class="content">{{ item.displaydescription }}</p>
+    <div class="engines">
+        <span>{{ item.source.label }}</span>
+    </div>
+    <div class="break"></div>
+</article>

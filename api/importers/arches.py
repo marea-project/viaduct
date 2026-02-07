@@ -1,5 +1,6 @@
 from rdflib.namespace import RDF, SKOS
 from ..models import GraphModel, Thesaurus, Concept, ConceptPredicate, ConceptProperty
+from tqdm import tqdm
 import json
 
 def load_instance_models(arches):
@@ -80,31 +81,35 @@ def __create_or_get_predicate(subject, property, object):
 		ret.save()
 	return ret
 
-def import_thesaurus(thesaurus):
+def import_thesaurus(thesaurus, quiet=True):
 	"""Loads a thesaurus proper from an Arches instance, parses the SKOS, and stores locally within the Viaduct database."""
+	bar_format = str(thesaurus) + " |{bar}| {n_fmt}/{total_fmt}"
+	if quiet:
+		bar_format = ""
 	g = thesaurus.load_skos()
 	ConceptProperty.objects.filter(subject__thesaurus=thesaurus).delete()
 	ConceptPredicate.objects.filter(subject__thesaurus=thesaurus).delete()
 	concepts = []
 	for concept, p, o in g.triples((None, RDF.type, SKOS.Concept)):
 		concepts.append(concept)
-	for concept in concepts:
-		item = __create_or_get_concept(str(concept), thesaurus)
-		for s, p, o in g.triples((concept, None, None)):
-			if o.__class__.__name__ == 'URIRef':
-				continue
-			p_uri = str(p)
-			if p_uri == 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type':
-				continue
-			p_id = p_uri.replace('#', '/').split('/')[-1]
-			value, lang = __convert_arches_skos_to_string(o)
-			prop = __create_or_get_property(item, p_id, value, lang, 'literal')
-		for s, p, o in g.triples((concept, None, None)):
-			if not o.__class__.__name__ == 'URIRef':
-				continue
-			p_uri = str(p)
-			if p_uri == 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type':
-				continue
-			p_id = p_uri.replace('#', '/').split('/')[-1]
-			object = __create_or_get_concept(str(o), thesaurus)
-			pred = __create_or_get_predicate(item, p_id, object)
+	with tqdm(concepts, leave=False, bar_format=bar_format) as prog:
+		for concept in prog:
+			item = __create_or_get_concept(str(concept), thesaurus)
+			for s, p, o in g.triples((concept, None, None)):
+				if o.__class__.__name__ == 'URIRef':
+					continue
+				p_uri = str(p)
+				if p_uri == 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type':
+					continue
+				p_id = p_uri.replace('#', '/').split('/')[-1]
+				value, lang = __convert_arches_skos_to_string(o)
+				prop = __create_or_get_property(item, p_id, value, lang, 'literal')
+			for s, p, o in g.triples((concept, None, None)):
+				if not o.__class__.__name__ == 'URIRef':
+					continue
+				p_uri = str(p)
+				if p_uri == 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type':
+					continue
+				p_id = p_uri.replace('#', '/').split('/')[-1]
+				object = __create_or_get_concept(str(o), thesaurus)
+				pred = __create_or_get_predicate(item, p_id, object)

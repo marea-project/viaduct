@@ -13,6 +13,8 @@
 <body class="results_endpoint" >
   <main id="main_results" class="">
 
+{% include 'search/results_form.html' %}
+
 <div id="results" class="only_template_default">
 
 <div id="sidebar">
@@ -27,15 +29,10 @@
   </div>
 </div>
 
-<div id="urls" role="main">
-<div class="template_group_default">
+{% if mode == 'list' %}
+{% include 'search/results_list.html' %}
+{% endif %}
 
-{% for item in results %}
-  {% include 'search/result_item.html' %}
-{% endfor %}
-
-</div>
-</div>
 </div>
 
   </main>

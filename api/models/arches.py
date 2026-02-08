@@ -218,6 +218,10 @@ class Concept(models.Model):
 		if label:
 			return str(label.value)
 		return self.conceptid
+	
+	@property
+	def uri(self):
+		return str(self.thesaurus.instance.url).rstrip('/') + '/' + str(self.conceptid)
 
 	class Meta:
 		unique_together = ('thesaurus', 'conceptid',)

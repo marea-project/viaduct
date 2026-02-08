@@ -1,4 +1,4 @@
-from api.models.arches import ArchesInstance
+from api.models.arches import ArchesInstance, Concept
 import re, asyncio
 
 def strip_html_tags(text):
@@ -32,3 +32,8 @@ def keyword_search(query_string):
         ret.append(x['_source'])
     return ret
 
+def concept_search(query_string):
+    ret = []
+    for concept in Concept.objects.filter(properties__value__icontains=query_string):
+        ret.append({'pk': concept.pk, 'label': concept.label, 'uri': concept.uri, 'source': str(concept.thesaurus.instance)})
+    return ret

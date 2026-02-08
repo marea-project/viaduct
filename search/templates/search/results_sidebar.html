@@ -1,0 +1,22 @@
+<div id="sidebar">
+  <div id="infoboxes">
+    <details class="sidebar-collapsible" open="">
+      <summary class="title">Semantic Data</summary>
+      {% for concept in concepts %}
+      <aside class="infobox">
+        <h2 class="title">{{ concept.label }}</h2>
+        <div class="attributes">
+        <dl>
+            <dt><bdi>URI : </bdi></dt>
+            <dd><bdi>{{ concept.uri }}</bdi></dd>
+        </dl>
+        <dl>
+            <dt><bdi>Source : </bdi></dt>
+            <dd><bdi>{{ concept.source }}</bdi></dd>
+        </dl>
+        </div>
+      </aside>
+      {% endfor %}
+    </details>
+  </div>
+</div>

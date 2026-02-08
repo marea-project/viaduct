@@ -17,17 +17,7 @@
 
 <div id="results" class="only_template_default">
 
-<div id="sidebar">
-  <div id="infoboxes">
-    <details class="sidebar-collapsible" open="">
-      <summary class="title">Info</summary>
-      <aside class="infobox">
-        <h2 class="title"><bdi>Information</bdi></h2>
-        <p><bdi>Some information.</bdi></p>
-      </aside>
-    </details>
-  </div>
-</div>
+{% include 'search/results_sidebar.html' %}
 
 {% if mode == 'list' %}
 {% include 'search/results_list.html' %}

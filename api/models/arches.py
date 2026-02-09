@@ -91,9 +91,11 @@ class ArchesInstance(models.Model):
 		filter = [{'inverted': False, 'type': 'string', 'context': '', 'context_label': '', 'id': query_string, 'text': 'Contains Term: ' + query_string, 'value': query_string, 'selected': True}]
 		query = {'paging-filter': page, 'tiles': 'true', 'format': 'tilecsv', 'reportlink': 'true', 'language': '*', 'term-filter': json.dumps(filter)}
 		url = self.url.rstrip('/') + "/search/resources?" + urlencode(query)
-		data = {}
-		with requests.get(url, headers={'User-Agent': settings.USER_AGENT}) as r:
-			data = r.json()
+		try:
+			with requests.get(url, headers={'User-Agent': settings.USER_AGENT}) as r:
+				data = r.json()
+		except:
+			data = {}
 		if not 'results' in data:
 			return []
 		if not 'hits' in data['results']:

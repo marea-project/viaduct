@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
 from search.util import keyword_search, concept_search
 
@@ -13,4 +14,4 @@ def results(request):
 		mode = 'map'
 	results = keyword_search(query)
 	concepts = concept_search(query)
-	return render(request, 'search/results.html', {"query": query, "mode": mode, "results": results, "concepts": concepts})
+	return render(request, 'search/results.html', {"query": query, "mode": mode, "results": results, "concepts": concepts, "mapboxkey": settings.MAPBOX_KEY})

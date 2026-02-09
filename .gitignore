@@ -5,6 +5,11 @@ __pycache__
 db.sqlite3
 media
 docs
+search/static/js/leaflet/leaflet*
+search/static/js/leaflet/images
 .env
 
 viaduct/settings_local.py
+
+
+

@@ -1,0 +1,16 @@
+<div id="map" style="height: 480px;"></div>
+
+<div id="mapbox-key" data-value="{{ mapboxkey }}"/>
+<div id="map-data" style="display: none;">
+{% for item in results %}
+    {% if item.points %}
+        {% for point in item.points %}
+            {% if point.point.lat %}
+                {% if point.point.lon %}
+                    <span data-lat="{{ point.point.lat }}" data-lon="{{ point.point.lon }}"><h2><a href="{{ item.url }}">{{ item.displayname }}</a></h2><p>{{ item.displaydescription }}</p></span>
+                {% endif %}
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+{% endfor %}
+</div>

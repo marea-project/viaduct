@@ -7,8 +7,10 @@
   <meta name="referrer" content="no-referrer">
   <meta name="robots" content="noarchive">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Viaduct | {{ query }}</title>
   <link rel="stylesheet" href="{% static 'css/search.css' %}" type="text/css" media="screen">
-  <title>Viaduct</title>
+  <link rel="stylesheet" href="{% static 'js/leaflet/leaflet.css' %}" type="text/css" media="screen">
+  <script src="{% static 'js/leaflet/leaflet.js' %}"></script>
 </head>
 <body class="results_endpoint" >
   <main id="main_results" class="">
@@ -23,9 +25,14 @@
 {% include 'search/results_list.html' %}
 {% endif %}
 
+{% if mode == 'map' %}
+{% include 'search/results_map.html' %}
+{% endif %}
+
 </div>
 
   </main>
   {% include 'search/footer.html' %}
 </body>
+<script src="{% static 'js/viaduct/viaduct.js' %}"></script>
 </html>

@@ -2,13 +2,17 @@ from django.shortcuts import render
 from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
 from search.util import keyword_search, concept_search
+import logging
+
+logger = logging.getLogger(__name__)
 
 def home(request):
 	return render(request, 'search/index.html', {})
 
 @csrf_exempt
 def results(request):
-	query = request.POST['q']
+	query = str(request.POST['q'])
+	logger.info("Keyword search: " + query)
 	mode = 'list'
 	if 'category_map' in request.POST:
 		mode = 'map'

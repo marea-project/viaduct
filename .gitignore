@@ -8,6 +8,7 @@ docs
 search/static/js/leaflet/leaflet*
 search/static/js/leaflet/images
 .env
+.vscode
 
 viaduct/settings_local.py
 

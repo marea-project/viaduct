@@ -17,6 +17,8 @@
 <body class="index_endpoint" >
   <main id="main_index" class="">
 
+{% include 'search/login_panel.html' %}
+
 <div class="index">
     <div class="title"><h1>viaduct</h1></div>
 <form id="search" method="POST" action="/search" role="search">{% csrf_token %}

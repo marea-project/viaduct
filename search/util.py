@@ -40,6 +40,6 @@ def keyword_search(query_string):
 
 def concept_search(query_string):
     ret = []
-    for concept in Concept.objects.filter(properties__value__icontains=query_string):
+    for concept in Concept.objects.filter(properties__value__icontains=query_string).distinct():
         ret.append({'pk': concept.pk, 'label': concept.label, 'uri': concept.uri, 'source': str(concept.thesaurus.instance)})
     return ret

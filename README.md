@@ -14,9 +14,3 @@ bypass the problem altogether by acting as a standalone portal for
 multiple Arches instances, allowing a user to perform complex
 searches on several instances at once, and return unified results
 using linked data methodology.
-
-## Demo
-
-A demonstration is available at https://viaduct.drashsmith.com/.
-Please bear in mind that this project is in very early stages,
-and currently only supports a very basic keyword search.

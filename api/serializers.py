@@ -40,7 +40,7 @@ class GraphModelSerializer(serializers.HyperlinkedModelSerializer):
     """
     class Meta:
         model = GraphModel
-        fields = ['url', 'name', 'description']
+        fields = ['url', 'name', 'description', 'export_url']
 
 class ThesaurusSerializer(serializers.HyperlinkedModelSerializer):
 	class Meta:

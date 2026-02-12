@@ -177,6 +177,10 @@ class GraphModel(models.Model):
 	created_time = models.DateTimeField(auto_now_add=True)
 	updated_time = models.DateTimeField(auto_now=True)
 
+	@property
+	def export_url(self):
+		return self.instance.url.rstrip('/') + '/graph/' + str(self.graphid) + '/export'
+
 	class Meta:
 		unique_together = ('instance', 'graphid',)
 

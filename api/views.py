@@ -39,7 +39,7 @@ class GraphModelViewSet(viewsets.ReadOnlyModelViewSet):
 	permission_classes = [permissions.IsAuthenticated]
 	def list(self, request):
 		queryset = GraphModel.objects.all()
-		serializer = GraphModelCondensedSerializer(queryset, many=True)
+		serializer = GraphModelCondensedSerializer(queryset, context={'request': request}, many=True)
 		return Response(serializer.data)
 	def retrieve(self, request, pk=None):
 		queryset = GraphModel.objects.all()

@@ -45,8 +45,34 @@ Set up the database by running the migrations
 python manage.py migrate
 ```
 
+Create an admin user...
+
+```bash
+python manage.py createsuperuser
+```
+
 Finally, run the development server.
 
 ```bash
 python manage.py runserver 0:8000
 ```
+
+## Adding data sources
+
+Next you need to add one or more Arches instances to search. To do this, access
+the API in a web browser by going to `http://localhost:8000/api`. Log in
+using the link at the top, then go to `http://localhost:8000/api/instances/`.
+From here you can use the Django REST Framework default UI to add Arches instances.
+
+### Populating vocabularies
+
+Once you've added some instances, you can import a copy of their vocabularies into
+Viaduct. To do this, from the command line, type...
+
+```bash
+python manage.py import_vocabularies
+```
+
+You should now see the concepts that your imported instances understand from the
+Viaduct API.
+

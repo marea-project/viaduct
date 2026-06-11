@@ -36,8 +36,9 @@ source .venv/bin/activate
 python -m pip install -r requirements.txt
 ```
 
-Create a local settings file at `viaduct/settings_local.py`. More 
-documentation on this will follow.
+Create a local settings file at `viaduct/settings_local.py`. You
+can use the `settings_local.py.sample` within the repository as
+a template.
 
 Set up the database by running the migrations
 
